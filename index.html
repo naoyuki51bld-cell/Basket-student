@@ -25,15 +25,22 @@
         .btn-outline { background: white; color: #ff9800; border: 1px solid #ff9800; }
         .btn-compact { padding: 4px 8px; font-size: 11px; min-width: auto; height: fit-content; margin-top: 0; box-shadow: none; }
         .schedule-card { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 8px; background: #fafafa; }
-        .status-options { display: flex; gap: 5px; margin: 10px 0; }
-        .status-options label { background: #eee; padding: 8px; border-radius: 20px; cursor: pointer; font-size: 12px; flex: 1; text-align: center; font-weight: bold; color: #555; }
+        
+        /* ▼ 変更: 出欠ボタンをわかりやすく立体的に ▼ */
+        .status-options { display: flex; gap: 8px; margin: 10px 0; }
+        .status-options label { display: flex; flex: 1; margin: 0; padding: 0; cursor: pointer; }
+        .status-options span { display: block; width: 100%; padding: 12px 0; text-align: center; border-radius: 8px; background: #f5f5f5; font-weight: bold; color: #9e9e9e; transition: all 0.2s ease-in-out; border: 2px solid transparent; font-size: 13px; box-sizing: border-box; }
         .status-options input[type="radio"] { display: none; }
-        .status-options input[type="radio"]:checked + span { color: #d32f2f; }
+        .status-options input[value="出席"]:checked + span { background: #e8f5e9; color: #2e7d32; border-color: #4CAF50; box-shadow: 0 2px 6px rgba(76,175,80,0.2); }
+        .status-options input[value="欠席"]:checked + span { background: #ffebee; color: #c62828; border-color: #f44336; box-shadow: 0 2px 6px rgba(244,67,54,0.2); }
+        .status-options input[value="遅刻"]:checked + span { background: #fff8e1; color: #f57f17; border-color: #ffb300; box-shadow: 0 2px 6px rgba(255,179,0,0.2); }
+        .status-options input[value="早退"]:checked + span { background: #fff8e1; color: #f57f17; border-color: #ffb300; box-shadow: 0 2px 6px rgba(255,179,0,0.2); }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; background: white; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         th { background: #f0f0f0; }
         .match-card { background: white; border: 1px solid #ddd; border-left: 5px solid #ff9800; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
-        .user-header { display: flex; justify-content: space-between; align-items: center; background: #fff3e0; padding: 8px 12px; border-radius: 8px; margin: 15px; border-left: 4px solid #ff9800; font-size: 13px; }
+        .user-header { display: flex; justify-content: space-between; align-items: center; background: #fff3e0; padding: 8px 12px; border-radius: 8px; margin: 15px; border-left: 4px solid #ff9800; font-size: 13px; font-weight: bold; }
         #calendar, #calendarView { max-width: 100%; height: 450px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 8px; border: 1px solid #eee;}
         .fc-event-title { font-size: 10px; font-weight: bold; white-space: normal !important; line-height: 1.2;}
         .fc-h-event { border: none !important; }
@@ -64,28 +71,24 @@
 
     <div id="mainArea" style="display: none;">
         <div class="user-header">
-            <div><strong id="dispName"></strong> (<span id="dispGrade"></span>/#<span id="dispNum"></span>)</div>
+            <div><span id="dispName"></span> (<span id="dispGrade"></span>/#<span id="dispNum"></span>)</div>
             <button class="btn-compact" style="background:#9e9e9e; color:white; border:none; border-radius:4px;" onclick="window.logout()">ログアウト</button>
         </div>
 
         <div class="tabs">
-            <button class="tab-button active" onclick="window.openTab(event, 'tab-view-schedule')">📅 予定</button>
+            <button class="tab-button active" onclick="window.openTab(event, 'tab-view-schedule')">📅 予定閲覧</button>
             <button class="tab-button" onclick="window.openTab(event, 'tab-single')">✍️ 個別出欠</button>
             <button class="tab-button" onclick="window.openTab(event, 'tab-batch')">📋 一括出欠</button>
-            <button class="tab-button" onclick="window.openTab(event, 'tab-view-att')">✅ 出欠確認</button>
             <button class="tab-button" onclick="window.openTab(event, 'tab-view-match')">📊 試合</button>
-            <button class="tab-button" onclick="window.openTab(event, 'tab-view-practice')">📝 練習</button>
+            <button class="tab-button" onclick="window.openTab(event, 'tab-view-practice')">📝 練習閲覧</button>
             <button class="tab-button" onclick="window.openTab(event, 'tab-profile')">⚙️ 設定</button>
         </div>
 
-        <!-- 1. 閲覧 -->
         <div id="tab-view-schedule" class="tab-content active">
-            <!-- 📢 顧問からの連絡枠 -->
             <div id="noticeArea" class="schedule-card" style="display:none; border-left:5px solid #ff9800; background:#fff3e0; margin-bottom:15px;">
                 <h4 style="margin-top:0; color:#e65100;">📢 顧問からの連絡</h4>
                 <div id="noticeContent" style="font-size:14px; white-space:pre-wrap; color:#333;"></div>
             </div>
-
             <p style="font-size:12px; color:#666; text-align:center; margin-top:0;">日付をタップすると詳細が表示されます</p>
             <div id="calendarView"></div>
             
@@ -94,14 +97,12 @@
                 <p id="viewDetailContent" style="font-size:14px; line-height:1.6;"></p>
                 <button class="btn btn-outline" style="padding:10px; margin-top:0;" onclick="document.getElementById('viewDetailArea').style.display='none'">閉じる</button>
             </div>
-
             <div id="scheduleHistoryArea" class="schedule-card" style="margin-top: 20px;">
                 <h4 style="color:#e65100; margin-top:0; border-bottom:1px solid #ccc; padding-bottom:5px;">🕒 予定の変更履歴</h4>
                 <ul id="scheduleHistoryList" style="font-size:12px; color:#555; padding-left:20px; margin-bottom:0; line-height:1.6;">読み込み中...</ul>
             </div>
         </div>
 
-        <!-- 2. 個別出欠 -->
         <div id="tab-single" class="tab-content">
             <p style="font-size:12px; color:#666; text-align:center; margin-top:0;">予定をタップして出欠を送信します</p>
             <div id="calendar"></div>
@@ -109,17 +110,16 @@
                 <h3 id="singleDateTitle" style="color: #ff9800; margin-top:0;"></h3>
                 <input type="hidden" id="singleDateVal">
                 <div class="status-options">
-                    <label style="background:#e8f5e9;"><input type="radio" name="singleStatus" value="出席" checked><span style="color:#2e7d32;">出席</span></label>
-                    <label style="background:#ffebee;"><input type="radio" name="singleStatus" value="欠席"><span style="color:#c62828;">欠席</span></label>
-                    <label style="background:#fff3e0;"><input type="radio" name="singleStatus" value="遅刻"><span style="color:#ef6c00;">遅刻</span></label>
-                    <label style="background:#fff3e0;"><input type="radio" name="singleStatus" value="早退"><span style="color:#ef6c00;">早退</span></label>
+                    <label><input type="radio" name="singleStatus" value="出席" checked><span>出席</span></label>
+                    <label><input type="radio" name="singleStatus" value="欠席"><span>欠席</span></label>
+                    <label><input type="radio" name="singleStatus" value="遅刻"><span>遅刻</span></label>
+                    <label><input type="radio" name="singleStatus" value="早退"><span>早退</span></label>
                 </div>
-                <input type="text" id="singleReason" placeholder="理由（任意）" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box;">
+                <input type="text" id="singleReason" placeholder="理由（任意）" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin-top:10px;">
                 <button class="btn btn-primary" onclick="window.submitSingle()">送信</button>
             </div>
         </div>
 
-        <!-- 3. 一括出欠 -->
         <div id="tab-batch" class="tab-content">
             <div class="filter-bar">
                 <div class="filter-label">月を選択</div>
@@ -129,17 +129,6 @@
             <button class="btn btn-primary" id="btnBatchSubmit" style="display:none;" onclick="window.submitBatch()">一括で送信する</button>
         </div>
 
-        <!-- NEW: 出欠確認 (先生と同じレイアウト) -->
-        <div id="tab-view-att" class="tab-content">
-            <div class="filter-bar">
-                <div class="filter-label">日付</div>
-                <select id="viewAttDate" class="filter-select" onchange="window.renderViewAtt()"></select>
-                <button class="filter-btn" onclick="window.reloadAttendance()">🔄 更新</button>
-            </div>
-            <div id="viewAttListArea">日付を選択してください。</div>
-        </div>
-
-        <!-- 4. 試合閲覧 -->
         <div id="tab-view-match" class="tab-content">
             <div class="filter-bar">
                 <div class="filter-label">種別</div>
@@ -149,7 +138,6 @@
             <div id="matchListArea">読み込み中...</div>
         </div>
 
-        <!-- 5. 練習閲覧 -->
         <div id="tab-view-practice" class="tab-content">
             <div class="filter-bar">
                 <div class="filter-label">月を選択</div>
@@ -159,7 +147,6 @@
             <div id="practiceDaysArea"></div>
         </div>
 
-        <!-- 6. 設定 -->
         <div id="tab-profile" class="tab-content">
             <div class="form-area" style="margin: 0 15px;">
                 <h3 style="margin-top:0; color:#e65100;">👤 プロフィール設定</h3>
@@ -180,6 +167,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app); const db = getFirestore(app);
     let calendar, calendarView, globalSchedules = [], globalAttendances = [], globalMorning = [], globalMatches = [], globalPractices = [], globalStudents = [], currentUser = null;
+    let schedulesMap = {}; let morningSet = new Set(); // 🚀 高速化用マップ
 
     function getWeekday(dStr) { if(!dStr) return ''; const days = ['日','月','火','水','木','金','土']; return days[new Date(dStr).getDay()]; }
 
@@ -203,17 +191,14 @@
         document.getElementById('authArea').style.display = 'none'; document.getElementById('mainArea').style.display = 'block';
         document.getElementById('dispName').innerText = currentUser.name; document.getElementById('dispGrade').innerText = currentUser.grade; document.getElementById('dispNum').innerText = currentUser.number || '-';
         document.getElementById('profGrade').value = currentUser.grade; document.getElementById('profNum').value = currentUser.number;
-        
-        await loadAllData();
-        initCalendarView(); initCalendarInput();
+        await loadAllData(); initCalendarView(); initCalendarInput();
     }
 
     async function loadScheduleLogs() {
         const snap = await getDocs(query(collection(db, "schedule_logs"), orderBy("timestamp", "desc"), limit(10)));
         let html = "";
         snap.forEach(d => {
-            const data = d.data();
-            const dt = new Date(data.timestamp).toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+            const data = d.data(); const dt = new Date(data.timestamp).toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
             html += `<li style="margin-bottom:6px; border-bottom:1px dashed #eee; padding-bottom:4px;">[${dt}] <b style="color:#e65100;">${data.userName}</b> が ${data.targetDate}(${getWeekday(data.targetDate)}) を <b>${data.action}</b></li>`;
         });
         document.getElementById('scheduleHistoryList').innerHTML = html || "履歴はありません";
@@ -221,22 +206,32 @@
 
     async function loadSettings() {
         const snap = await getDoc(doc(db, "settings", "general"));
-        if(snap.exists() && snap.data().noticeVisible && snap.data().noticeText) {
-            document.getElementById('noticeArea').style.display = 'block';
-            document.getElementById('noticeContent').innerText = snap.data().noticeText;
-        } else {
-            document.getElementById('noticeArea').style.display = 'none';
-        }
+        if(snap.exists() && snap.data().noticeVisible && snap.data().noticeText) { document.getElementById('noticeArea').style.display = 'block'; document.getElementById('noticeContent').innerText = snap.data().noticeText; } else { document.getElementById('noticeArea').style.display = 'none'; }
     }
 
+    // 🚀 並行処理 (Promise.all) でロード時間を大幅短縮
     async function loadAllData() {
         await loadSettings();
-        globalSchedules = (await getDocs(collection(db, "schedules"))).docs.map(d=>({id:d.id, ...d.data()}));
-        globalAttendances = (await getDocs(collection(db, "attendance"))).docs.map(d=>d.data());
-        globalMorning = (await getDocs(collection(db, "morning"))).docs.map(d=>d.id);
-        globalMatches = (await getDocs(query(collection(db, "matches"), orderBy("date", "desc")))).docs.map(d=>({id:d.id, ...d.data()}));
-        globalPractices = (await getDocs(collection(db, "practices"))).docs.map(d=>({id:d.id, ...d.data()}));
-        globalStudents = (await getDocs(collection(db, "students"))).docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(parseInt(a.number)||999)-(parseInt(b.number)||999));
+        const [schedSnap, attSnap, mornSnap, matchSnap, pracSnap, studSnap] = await Promise.all([
+            getDocs(collection(db, "schedules")),
+            getDocs(collection(db, "attendance")),
+            getDocs(collection(db, "morning")),
+            getDocs(query(collection(db, "matches"), orderBy("date", "desc"))),
+            getDocs(collection(db, "practices")),
+            getDocs(collection(db, "students"))
+        ]);
+
+        globalSchedules = schedSnap.docs.map(d=>({id:d.id, ...d.data()}));
+        globalAttendances = attSnap.docs.map(d=>d.data());
+        globalMorning = mornSnap.docs.map(d=>d.id);
+        globalMatches = matchSnap.docs.map(d=>({id:d.id, ...d.data()}));
+        globalPractices = pracSnap.docs.map(d=>({id:d.id, ...d.data()}));
+        globalStudents = studSnap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(parseInt(a.number)||999)-(parseInt(b.number)||999));
+
+        // 🚀 カレンダー描画用キャッシュ作成
+        schedulesMap = {};
+        globalSchedules.forEach(s => { if (!schedulesMap[s.date]) schedulesMap[s.date] = []; schedulesMap[s.date].push(s); });
+        morningSet = new Set(globalMorning);
 
         const months = [...new Set(globalSchedules.map(s => s.date.substring(0, 7)))].sort();
         const selMonth = document.getElementById('monthSelect'); selMonth.innerHTML = '<option value="">-- 月を選択 --</option>';
@@ -245,12 +240,6 @@
         const pMonths = [...new Set(globalPractices.map(p => p.date.substring(0, 7)))].sort().reverse();
         const pSel = document.getElementById('practiceMonthSelect'); pSel.innerHTML = '<option value="">-- 選択 --</option>';
         pMonths.forEach(m => pSel.innerHTML += `<option value="${m}">${m.replace('-','年')}月</option>`);
-
-        const dates = [...new Set(globalSchedules.map(s => s.date))].sort();
-        const aSel = document.getElementById('viewAttDate'); aSel.innerHTML = '<option value="">-- 選択 --</option>';
-        const todayStr = new Date(new Date().getTime() - new Date().getTimezoneOffset()*60000).toISOString().split('T')[0];
-        dates.forEach(d => aSel.innerHTML += `<option value="${d}">${d} (${getWeekday(d)})</option>`);
-        if(dates.includes(todayStr)) { aSel.value = todayStr; }
 
         await loadScheduleLogs();
     }
@@ -263,16 +252,14 @@
         if (tabId === 'tab-batch') window.renderBatchList();
         if (tabId === 'tab-view-match') window.loadMatches();
         if (tabId === 'tab-view-practice') window.renderPracticeDays();
-        if (tabId === 'tab-view-att') window.renderViewAtt();
     };
 
     function getEvents() {
         return globalSchedules.map(d => {
             let timeStr = d.timeType === 'half' ? d.halfType : (d.startTime ? d.startTime + '〜' : '');
             let locStr = (d.location && d.location !== '都留高') ? d.location : '';
-            let t = `[${d.eventType||'練習'}] ${timeStr} ${locStr}`;
             let bg = d.eventType==='練習試合' ? '#ff9800' : (d.eventType==='公式戦'?'#f44336':'#4CAF50');
-            return { id: d.id, title: t, start: d.date, allDay: true, backgroundColor: bg, borderColor: bg, extendedProps: d };
+            return { id: d.id, title: `[${d.eventType||'練習'}] ${timeStr} ${locStr}`, start: d.date, allDay: true, backgroundColor: bg, borderColor: bg, extendedProps: d };
         });
     }
 
@@ -285,10 +272,12 @@
         if(timeStr) html += `<div>${timeStr}</div>`; if(locStr) html += `<div>${locStr}</div>`; html += `</div>`; return { html: html };
     }
 
+    // 🚀 O(1)アクセスで描画を高速化
     function renderDayCell(arg) {
         const localStr = new Date(arg.date.getTime() - (arg.date.getTimezoneOffset()*60000)).toISOString().split('T')[0];
-        const hasRem = globalSchedules.some(s => s.date === localStr && s.remarks);
-        const hasMorn = globalMorning.includes(localStr);
+        const dayEvents = schedulesMap[localStr] || [];
+        const hasRem = dayEvents.some(s => s.remarks);
+        const hasMorn = morningSet.has(localStr);
         let badges = ''; if(hasMorn) badges += '<span style="color:#ff9800; font-weight:bold; margin-left:4px;">〇</span>'; if(hasRem) badges += '<span style="color:red; font-weight:bold; margin-left:2px;">*</span>';
         return { html: `<div style="text-align:right; padding:2px;">${arg.dayNumberText}${badges}</div>` };
     }
@@ -302,7 +291,7 @@
                 document.getElementById('viewDetailTitle').innerText = `📅 ${d.date} (${getWeekday(d.date)}) の詳細`;
                 let timeStr = d.timeType === 'half' ? d.halfType : (d.startTime ? d.startTime + '〜' + (d.endTime||'') : '未定');
                 let detail = `<b style="color:#1a237e;">【${d.eventType}】</b><br><br><b>時間:</b> ${timeStr}<br><b>場所:</b> ${d.location||'未定'}<br><b>備考:</b> ${d.remarks||'なし'}<br>`;
-                if (globalMorning.includes(d.date)) detail += `<br><span style="color:#ff9800; font-weight:bold;">🌅 朝練あり(〇)</span>`;
+                if (morningSet.has(d.date)) detail += `<br><span style="color:#ff9800; font-weight:bold;">🌅 朝練あり(〇)</span>`;
                 document.getElementById('viewDetailContent').innerHTML = detail; document.getElementById('viewDetailArea').scrollIntoView({ behavior: 'smooth' });
             }
         });
@@ -340,12 +329,12 @@
             let existing = globalAttendances.find(a => a.date === s.date && a.name === currentUser.name) || {status: '出席', reason: ''};
             html += `<div class="schedule-card"><strong>📅 ${s.date} (${getWeekday(s.date)})</strong> | ${s.eventType} <br><span style="font-size:12px; color:#666;">${timeStr} @${s.location || '未定'}</span>
                 <div class="status-options">
-                    <label style="${existing.status==='出席'?'background:#e8f5e9;':''}"><input type="radio" name="b_${s.id}" value="出席" ${existing.status==='出席'?'checked':''}><span>出席</span></label>
-                    <label style="${existing.status==='欠席'?'background:#ffebee;':''}"><input type="radio" name="b_${s.id}" value="欠席" ${existing.status==='欠席'?'checked':''}><span>欠席</span></label>
-                    <label style="${existing.status==='遅刻'?'background:#fff3e0;':''}"><input type="radio" name="b_${s.id}" value="遅刻" ${existing.status==='遅刻'?'checked':''}><span>遅刻</span></label>
-                    <label style="${existing.status==='早退'?'background:#fff3e0;':''}"><input type="radio" name="b_${s.id}" value="早退" ${existing.status==='早退'?'checked':''}><span>早退</span></label>
+                    <label><input type="radio" name="b_${s.id}" value="出席" ${existing.status==='出席'?'checked':''}><span>出席</span></label>
+                    <label><input type="radio" name="b_${s.id}" value="欠席" ${existing.status==='欠席'?'checked':''}><span>欠席</span></label>
+                    <label><input type="radio" name="b_${s.id}" value="遅刻" ${existing.status==='遅刻'?'checked':''}><span>遅刻</span></label>
+                    <label><input type="radio" name="b_${s.id}" value="早退" ${existing.status==='早退'?'checked':''}><span>早退</span></label>
                 </div>
-                <input type="text" id="re_${s.id}" placeholder="理由（任意）" value="${existing.reason}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc;"><input type="hidden" class="b-date" data-id="${s.id}" value="${s.date}">
+                <input type="text" id="re_${s.id}" placeholder="理由（任意）" value="${existing.reason}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box;"><input type="hidden" class="b-date" data-id="${s.id}" value="${s.date}">
             </div>`;
         });
         area.innerHTML = html; btn.style.display = 'block';
@@ -363,18 +352,6 @@
             }
             alert("一括送信しました");
         } catch (e) { alert("エラーが発生しました。"); } finally { btn.innerText = "一括で送信する"; }
-    };
-
-    // --- 出欠閲覧 ---
-    window.reloadAttendance = async function() { await loadAllData(); window.renderViewAtt(); };
-    window.renderViewAtt = function() {
-        const date = document.getElementById('viewAttDate').value; if(!date) return document.getElementById('viewAttListArea').innerHTML = "日付を選択してください";
-        const dayData = globalAttendances.filter(a => a.date === date); let html = "<table><tr><th style='width:40px;'>背</th><th>名前</th><th>出欠</th><th>理由</th></tr>";
-        globalStudents.forEach(p => {
-            const a = dayData.find(x => x.name === p.name) || {status:'未入力', reason:''}; const bg = a.status === '欠席' ? 'background-color: #ffebee;' : '';
-            html += `<tr style="${bg}"><td>${p.number||'-'}</td><td style="text-align:left;">${p.name}</td>
-            <td><b>${a.status}</b></td><td>${a.reason||''}</td></tr>`;
-        }); document.getElementById('viewAttListArea').innerHTML = html + "</table>";
     };
 
     window.saveProfile = async () => { const g = document.getElementById('profGrade').value, n = document.getElementById('profNum').value; await updateDoc(doc(db, "students", currentUser.id), { grade: g, number: n }); currentUser.grade=g; currentUser.number=n; alert("更新しました"); location.reload(); };
@@ -401,8 +378,8 @@
             if(filter !== 'すべて' && m.type !== filter) return;
             const res = m.scoreOurs > m.scoreTheirs ? "<span style='color:red'>勝利</span>" : (m.scoreOurs < m.scoreTheirs ? "<span style='color:blue'>敗北</span>" : "引分");
             let imgHtml = m.imageUrl ? `<img src="${m.imageUrl}" style="max-width:100%; border-radius:4px; margin-top:10px;">` : '';
-            let linksHtml = ""; for(let i=1; i<=5; i++) if(m['linkUrl'+i]) linksHtml += `<a href="${m['linkUrl'+i]}" target="_blank" style="display:inline-block; margin-right:15px; margin-bottom:8px; color:#ff9800; font-weight:bold; text-decoration:none;">🔗 ${m['linkTitle'+i]||'リンク'+i}</a>`;
-            if(linksHtml) linksHtml = `<div style="margin:10px 0; font-size:13px; background:#fff3e0; padding:10px; border-radius:6px;">${linksHtml}</div>`;
+            let linksHtml = ""; for(let i=1; i<=5; i++) if(m['linkUrl'+i]) linksHtml += `<a href="${m['linkUrl'+i]}" target="_blank" style="display:inline-block; margin-right:15px; margin-bottom:8px; color:#1a237e;">🔗 ${m['linkTitle'+i]||'リンク'+i}</a>`;
+            if(linksHtml) linksHtml = `<div style="margin:10px 0; font-size:12px; background:#f9f9f9; padding:8px; border-radius:4px;">${linksHtml}</div>`;
             
             let statsHtml = "";
             if (m.stats && m.stats.length > 0 && m.statColumns) {
@@ -416,17 +393,17 @@
             refs.forEach(c => {
                 let isT = c.role === 'teacher'; let dateStr = new Date(c.createdAt).toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
                 commHtml += `<div class="comment-box ${isT?'comment-teacher':''}">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong style="color:${isT?'#1b5e20':'#ff9800'}">${isT?'👔 ':''}${c.authorName}</strong><span style="font-size:10px; color:#999;">${dateStr}</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong style="color:${isT?'#1a237e':'#ff9800'}">${isT?'👔 ':''}${c.authorName}</strong><span style="font-size:10px; color:#999;">${dateStr}</span></div>
                     <div>${c.text}</div>
                     <div style="text-align:right; margin-top:5px;">
                         ${(c.authorId === currentUser.id) ? `<button class="btn-compact" style="background:transparent; border:none; color:blue; cursor:pointer;" onclick="window.editComment('${m.id}','${c.id}')">編集</button>` : ''}
                         ${(c.authorId === currentUser.id) ? `<button class="btn-compact" style="background:transparent; border:none; color:red; cursor:pointer;" onclick="window.deleteComment('${m.id}','${c.id}')">削除</button>` : ''}
                     </div></div>`;
             });
-            commHtml += `<textarea id="commentInput-${m.id}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; margin-top:10px;" rows="2" placeholder="反省や感想を入力..."></textarea><button class="btn btn-primary" style="padding:10px; font-size:13px; margin-top:8px; width:100%;" onclick="window.postComment('${m.id}')">投稿する</button></div>`;
+            commHtml += `<textarea id="commentInput-${m.id}" style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; box-sizing:border-box; margin-top:10px;" rows="2" placeholder="反省や感想を入力..."></textarea><button class="btn btn-primary" style="padding:10px; font-size:13px; margin-top:8px; width:100%;" onclick="window.postComment('${m.id}')">投稿する</button></div>`;
 
             html += `<div class="match-card"><span style="background:#ff9800; color:white; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:bold;">${m.type||'試合'}</span>
-                <b style="font-size:15px; margin-left:10px;">📅 ${m.date} (${getWeekday(m.date)}) | ${m.name}</b><br><div style="font-size:22px; font-weight:800; margin:15px 0; text-align:center;">都留高 <span style="color:#ff9800;">${m.scoreOurs}</span> [${res}] <span style="color:#d32f2f;">${m.scoreTheirs}</span> ${m.opponent}</div>
+                <b style="font-size:15px; margin-left:10px;">📅 ${m.date} (${getWeekday(m.date)}) | ${m.name}</b><br><div style="font-size:20px; font-weight:bold; margin:15px 0; text-align:center;">都留高 <span style="color:#ff9800;">${m.scoreOurs}</span> [${res}] <span style="color:#d32f2f;">${m.scoreTheirs}</span> ${m.opponent}</div>
                 <button class="btn btn-outline" style="width:100%; padding:8px; font-size:12px;" onclick="window.toggleDetails('${m.id}')">詳細・反省を見る (${refs.length}件) ▼</button>
                 ${commHtml}</div>`;
         });
@@ -483,7 +460,7 @@
                 (menu.links||[]).forEach((l) => { if(l.url) linksHtml += `<a href="${l.url}" target="_blank" style="display:inline-block; margin-right:10px; margin-top:5px; color:#ff9800; font-weight:bold; text-decoration:none;">🔗 ${l.title||'リンク'}</a>`; });
 
                 menusHtml += `<div style="margin-top:10px; padding:12px; background:#fff3e0; border-left:4px solid #ff9800; border-radius:6px;">
-                    <div style="font-weight:bold; color:#e65100; cursor:pointer;" onclick="window.togglePracticeMenu('${p.id}-${i}')">▶ ${menu.title||'名称未設定'}</div>
+                    <div style="font-weight:bold; color:#e65100; cursor:pointer;" onclick="window.togglePracticeMenu('${p.id}-${i}')">▶ [${menu.type}] ${menu.title}</div>
                     <div id="prac-menu-${p.id}-${i}" style="display:none; margin-top:8px;">${linksHtml}${detailHtml}</div></div>`;
             });
             
@@ -492,14 +469,14 @@
             refs.forEach(c => {
                 let isT = c.role === 'teacher'; let dateStr = new Date(c.createdAt).toLocaleString('ja-JP', {month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
                 commHtml += `<div class="comment-box ${isT?'comment-teacher':''}">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong style="color:${isT?'#1b5e20':'#ff9800'}">${isT?'👔 ':''}${c.authorName}</strong><span style="font-size:10px; color:#999;">${dateStr}</span></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><strong style="color:${isT?'#1a237e':'#ff9800'}">${isT?'👔 ':''}${c.authorName}</strong><span style="font-size:10px; color:#999;">${dateStr}</span></div>
                     <div>${c.text}</div>
                     <div style="text-align:right; margin-top:5px;">
-                        ${(c.authorId === currentUser.id) ? `<button type="button" class="btn-compact" style="background:transparent; border:none; color:#1976d2; cursor:pointer;" onclick="window.editPracticeComment('${p.id}','${c.id}')">編集</button>` : ''}
-                        ${(c.authorId === currentUser.id) ? `<button type="button" class="btn-compact" style="background:transparent; border:none; color:#d32f2f; cursor:pointer;" onclick="window.deletePracticeComment('${p.id}','${c.id}')">削除</button>` : ''}
+                        ${(c.authorId === currentUser.id) ? `<button class="btn-compact" style="background:transparent; border:none; color:blue; cursor:pointer;" onclick="window.editPracticeComment('${p.id}','${c.id}')">編集</button>` : ''}
+                        ${(c.authorId === currentUser.id) ? `<button class="btn-compact" style="background:transparent; border:none; color:red; cursor:pointer;" onclick="window.deletePracticeComment('${p.id}','${c.id}')">削除</button>` : ''}
                     </div></div>`;
             });
-            commHtml += `<textarea id="pracCommentInput-${p.id}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; margin-top:10px;" rows="2" placeholder="コメントする..."></textarea><button type="button" class="btn btn-primary" style="padding:10px; font-size:13px; margin-top:8px; width:100%;" onclick="window.postPracticeComment('${p.id}')">投稿する</button></div>`;
+            commHtml += `<textarea id="pracCommentInput-${p.id}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; margin-top:10px;" rows="2" placeholder="コメントする..."></textarea><button class="btn btn-primary" style="padding:10px; font-size:13px; margin-top:8px; width:100%;" onclick="window.postPracticeComment('${p.id}')">投稿する</button></div>`;
 
             html += `<div class="schedule-card" style="padding:15px;">
                 <div style="font-size:16px; font-weight:bold; cursor:pointer; display:flex; justify-content:space-between;" onclick="window.togglePracticeDay('${p.id}')"><span style="color:#e65100;">📅 ${p.date} (${getWeekday(p.date)})</span><span>▼</span></div>
